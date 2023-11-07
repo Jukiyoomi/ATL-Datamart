@@ -1,7 +1,8 @@
-from minio import Minio
-import urllib.request
-import pandas as pd
 import sys
+
+import requests
+from minio import Minio
+
 
 def main():
     grab_data()
@@ -15,6 +16,39 @@ def grab_data() -> None:
     Files need to be saved into "../../data/raw" folder
     This methods takes no arguments and returns nothing.
     """
+
+    # Constants
+    base_url = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata"
+    folder = "../../data/raw/"
+
+    year_range = range(2017, 2024)
+    month_range = range(1, 13)
+
+    for year in year_range:
+        error_count = 0
+        print(f"Downloading files for year {year}")
+        for month in month_range:
+            if month < 10:
+                month = "0" + str(month)
+            url = f"{base_url}_{year}-{month}.parquet"
+            filename = folder + url.split('/')[-1]
+            print("Downloading file from ", url, " to ", filename)
+            response = requests.get(url)
+            if response.ok:
+                with open(filename, 'wb') as f:
+                    f.write(response.content)
+                print(f"Downloaded file: {filename}")
+            else:
+                print(f"Can't download: {filename}, skipping...")
+                if error_count >= 3:
+                    print("Can't seem to download more files, exiting...")
+                    break
+                else:
+                    error_count += 1
+                    continue
+        print(f"Downloaded all files for year {year} !")
+
+    print("Downloaded all files !")
 
 
 def write_data_minio():
