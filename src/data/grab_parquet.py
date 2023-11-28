@@ -9,6 +9,7 @@ def main():
     grab_data()
     write_data_minio()
 
+
 def grab_data() -> None:
     """Grab the data from New York Yellow Taxi
 
@@ -80,5 +81,6 @@ def write_data_minio():
             except S3Error as e:
                 print(f"Erreur lors de l'upload de {object_name}: {e}")
 
+
 if __name__ == '__main__':
-    write_data_minio()
+    sys.exit(main())
