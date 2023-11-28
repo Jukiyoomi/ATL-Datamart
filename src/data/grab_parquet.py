@@ -54,7 +54,8 @@ def grab_data() -> None:
 
 def write_data_minio():
     """
-    Cette méthode met tous les fichiers Parquet dans Minio
+    This method put all Parquet files into Minio
+    Ne pas faire cette méthode pour le moment
     """
     client = Minio(
         "localhost:9000",
