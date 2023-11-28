@@ -21,7 +21,7 @@ def grab_data() -> None:
     base_url = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata"
     folder = "../../data/raw/"
 
-    year_range = range(2017, 2024)
+    year_range = range(2023)
     month_range = range(1, 13)
 
     for year in year_range:
