@@ -1,12 +1,13 @@
+import os
 import sys
 
 import requests
-from minio import Minio
+from minio import Minio, S3Error
 
 
 def main():
     grab_data()
-    
+    write_data_minio()
 
 def grab_data() -> None:
     """Grab the data from New York Yellow Taxi
@@ -53,8 +54,7 @@ def grab_data() -> None:
 
 def write_data_minio():
     """
-    This method put all Parquet files into Minio
-    Ne pas faire cette méthode pour le moment
+    Cette méthode met tous les fichiers Parquet dans Minio
     """
     client = Minio(
         "localhost:9000",
@@ -62,12 +62,22 @@ def write_data_minio():
         access_key="minio",
         secret_key="minio123"
     )
-    bucket: str = "NOM_DU_BUCKET_ICI"
-    found = client.bucket_exists(bucket)
-    if not found:
-        client.make_bucket(bucket)
-    else:
-        print("Bucket " + bucket + " existe déjà")
+    bucket_name = "newyork"
+
+    if not client.bucket_exists(bucket_name):
+        client.make_bucket(bucket_name)
+        print("Bucket " + bucket_name + " créé avec succès")
+
+    folder_path = "../../data/raw/"
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".parquet"):
+            file_path = os.path.join(folder_path, filename)
+            object_name = filename
+            try:
+                client.fput_object(bucket_name, object_name, file_path)
+                print(f"Upload réussi: {object_name}")
+            except S3Error as e:
+                print(f"Erreur lors de l'upload de {object_name}: {e}")
 
 if __name__ == '__main__':
-    sys.exit(main())
+    write_data_minio()
