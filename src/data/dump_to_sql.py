@@ -3,7 +3,7 @@ import os
 import sys
 
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, table
 
 
 def write_data_postgres(dataframe: pd.DataFrame) -> bool:
@@ -36,7 +36,10 @@ def write_data_postgres(dataframe: pd.DataFrame) -> bool:
         with engine.connect():
             success: bool = True
             print("Connection successful! Processing parquet file")
-            dataframe.to_sql(db_config["dbms_table"], engine, index=False, if_exists='append')
+            if dataframe.to_sql(db_config["dbms_table"], engine, index=False, if_exists='append'):
+                print("Dataframe successfully dumped into the DBMS")
+            else:
+                raise Exception("Error dumping dataframe to the DBMS")
 
     except Exception as e:
         success: bool = False
@@ -67,7 +70,9 @@ def main() -> None:
     for parquet_file in parquet_files:
         parquet_df: pd.DataFrame = pd.read_parquet(folder_path + parquet_file, engine='pyarrow')
         clean_column_name(parquet_df)
+        print(f"Processing file: {parquet_file}")
         if not write_data_postgres(parquet_df):
+            print("Error dumping dataframe to the DBMS, exiting...")
             del parquet_df
             gc.collect()
             return

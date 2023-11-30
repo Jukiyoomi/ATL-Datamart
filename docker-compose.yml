@@ -4,7 +4,7 @@ services:
   minio:
     hostname: minio
     image: "minio/minio"
-    container_name: minio
+    container_name: newyork_minio
     ports:
       - "9001:9001"
       - "9000:9000"
@@ -17,6 +17,7 @@ services:
     networks:
       - spark_network
   db:
+    container_name: newyork_postgres
     image: postgres:latest
     restart: always
     ports:
@@ -29,7 +30,7 @@ services:
 
   zookeeper:
     hostname: zookeeper
-    container_name: zookeeper
+    container_name: newyork_zookeeper
     image: 'bitnami/zookeeper:latest'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes

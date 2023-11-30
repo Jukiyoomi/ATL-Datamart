@@ -78,6 +78,7 @@ def write_data_minio():
             try:
                 client.fput_object(bucket_name, object_name, file_path)
                 print(f"Upload réussi: {object_name}")
+                os.remove(file_path)
             except S3Error as e:
                 print(f"Erreur lors de l'upload de {object_name}: {e}")
 
